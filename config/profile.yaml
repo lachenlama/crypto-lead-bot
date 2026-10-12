@@ -1,0 +1,56 @@
+# Owner profile. Edit freely; used by rule scoring and sent to the LLM.
+priority_skills:
+  - python
+  - on-chain analytics
+  - data analytics
+  - dune
+  - telegram bot
+  - discord bot
+  - discord to telegram bridge
+  - ai agent
+  - llm
+  - automation
+  - typescript
+  - next.js
+  - full stack
+  - dashboard
+secondary_skills:
+  - solidity
+  - evm
+  - defi
+goal: >-
+  Gain fund management / treasury experience to boost on-chain analyst,
+  treasury, DAO finance and research analyst roles.
+bonus_keywords:       # analyst / treasury / fund roles get a bonus
+  - analyst
+  - treasury
+  - fund
+  - dao finance
+  - research
+  - portfolio
+avoid_keywords:       # penalised (low priority, not excluded)
+  - auditor
+  - security auditor
+  - sales
+  - business development
+  - bd manager
+  - community moderator
+  - moderator
+  - ambassador
+  - community manager
+rate_floor:
+  hour: 60
+  fixed: 600
+  currency: USD
+remote_only: true
+packages:
+  - name: community bot
+    price_range: "$600-$1500"
+  - name: trading/alert bot
+    price_range: "$800-$2500"
+  - name: on-chain analytics dashboard
+    price_range: "$1000-$3000"
+  - name: AI agent/automation
+    price_range: "$1000-$3500"
+  - name: full-stack dApp/internal tool
+    price_range: "$2000-$6000"

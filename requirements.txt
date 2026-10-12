@@ -1,0 +1,6 @@
+httpx
+feedparser
+beautifulsoup4
+pyyaml
+anthropic
+pytest

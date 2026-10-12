@@ -1,0 +1,3 @@
+[{"id":"a1","title":"Build a Telegram alert bot","slug":"tg-alert-bot","type":"bounty","rewardAmount":1500,"token":"USDC","deadline":"2026-11-01T00:00:00Z","status":"OPEN","compensationType":"fixed","sponsor":{"name":"Acme DAO"},"agentAccess":"HUMAN_ONLY"},
+{"id":"a2","title":"Closed bounty","slug":"closed","type":"bounty","rewardAmount":500,"token":"USDC","status":"CLOSED","sponsor":{"name":"Z"}},
+{"id":"a3","title":"Agent task","slug":"agent-task","type":"bounty","rewardAmount":100,"token":"USDC","status":"OPEN","sponsor":{"name":"Z"},"agentAccess":"AGENT_ONLY"}]
