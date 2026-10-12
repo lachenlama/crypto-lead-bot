@@ -55,58 +55,58 @@ companies:
   - {name: Dune, ats: ashby, token: dune, tier: 1}
   - {name: Nansen, ats: ashby, token: nansen, tier: 1}
   - {name: Messari, ats: greenhouse, token: messari, tier: 2}
-  - {name: Chainalysis, ats: greenhouse, token: chainalysis, tier: 2}
-  - {name: Kaiko, ats: lever, token: kaiko, tier: 2}
-  - {name: Token Terminal, ats: ashby, token: tokenterminal, tier: 1}
+  # - {name: Chainalysis, ats: greenhouse, token: chainalysis, tier: 2}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
+  # - {name: Kaiko, ats: lever, token: kaiko, tier: 2}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
+  # - {name: Token Terminal, ats: ashby, token: tokenterminal, tier: 1}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
   - {name: Artemis, ats: ashby, token: artemis, tier: 1}
   - {name: Allium, ats: ashby, token: allium, tier: 1}
-  - {name: Flipside, ats: greenhouse, token: flipsidecrypto, tier: 2}
-  - {name: Coin Metrics, ats: greenhouse, token: coinmetrics, tier: 2}
+  - {name: Flipside, ats: greenhouse, token: flipside, tier: 2}
+  # - {name: Coin Metrics, ats: greenhouse, token: coinmetrics, tier: 2}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
   # --- DeFi risk / treasury / funds ---
-  - {name: Gauntlet, ats: greenhouse, token: gauntlet, tier: 1}
-  - {name: Chaos Labs, ats: ashby, token: chaoslabs, tier: 1}
+  - {name: Gauntlet, ats: lever, token: gauntlet, tier: 1}
+  - {name: Chaos Labs, ats: lever, token: chaoslabs, tier: 1}
   - {name: Steakhouse Financial, ats: ashby, token: steakhouse, tier: 1}
-  - {name: karpatkey, ats: ashby, token: karpatkey, tier: 1}
-  - {name: LlamaRisk, ats: ashby, token: llamarisk, tier: 1}
-  - {name: Galaxy, ats: greenhouse, token: galaxydigital, tier: 2}
-  - {name: Wintermute, ats: greenhouse, token: wintermute, tier: 2}
+  # - {name: karpatkey, ats: ashby, token: karpatkey, tier: 1}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
+  # - {name: LlamaRisk, ats: ashby, token: llamarisk, tier: 1}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
+  - {name: Galaxy, ats: greenhouse, token: galaxydigitalservices, tier: 2}
+  # - {name: Wintermute, ats: greenhouse, token: wintermute, tier: 2}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
   - {name: Paradigm, ats: ashby, token: paradigm, tier: 2}
   - {name: Ondo, ats: greenhouse, token: ondofinance, tier: 2}
-  - {name: Ethena, ats: ashby, token: ethena, tier: 2}
+  - {name: Ethena, ats: lever, token: ethena, tier: 2}
   - {name: Anchorage Digital, ats: lever, token: anchorage, tier: 2}
-  - {name: Circle, ats: greenhouse, token: circle, tier: 2}
+  - {name: Circle, ats: ashby, token: circle, tier: 2}
   # --- exchanges / protocol labs / infra / wallets ---
   - {name: Coinbase, ats: greenhouse, token: coinbase, tier: 2}
   - {name: Kraken, ats: ashby, token: kraken.com, tier: 2}
-  - {name: Uniswap Labs, ats: greenhouse, token: uniswaplabs, tier: 2}
-  - {name: Aave Labs, ats: ashby, token: aave, tier: 2}
-  - {name: Alchemy, ats: greenhouse, token: alchemy, tier: 2}
+  - {name: Uniswap Labs, ats: ashby, token: uniswap, tier: 2}
+  # - {name: Aave Labs, ats: ashby, token: aave, tier: 2}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
+  - {name: Alchemy, ats: ashby, token: alchemy, tier: 2}
   - {name: Phantom, ats: ashby, token: phantom, tier: 2}
   - {name: Fireblocks, ats: greenhouse, token: fireblocks, tier: 2}
-  - {name: Chainlink Labs, ats: greenhouse, token: chainlinklabs, tier: 2}
-  - {name: Offchain Labs, ats: greenhouse, token: offchainlabs, tier: 2}
-  - {name: OP Labs, ats: greenhouse, token: oplabs, tier: 2}
+  # - {name: Chainlink Labs, ats: greenhouse, token: chainlinklabs, tier: 2}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
+  - {name: Offchain Labs, ats: lever, token: offchainlabs, tier: 2}
+  - {name: OP Labs, ats: ashby, token: oplabs, tier: 2}
   - {name: Consensys (incl. MetaMask), ats: greenhouse, token: consensys, tier: 2}
-  - {name: Eigen Labs, ats: greenhouse, token: eigenlabs, tier: 2}
-  - {name: Ledger, ats: lever, token: ledger, tier: 2}
-  - {name: Lido, ats: ashby, token: lido, tier: 2}
-  - {name: Polygon Labs, ats: ashby, token: polygon, tier: 2}
+  - {name: Eigen Labs, ats: ashby, token: eigen-labs, tier: 2}
+  - {name: Ledger, ats: ashby, token: ledger, tier: 2}
+  # - {name: Lido, ats: ashby, token: lido, tier: 2}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
+  - {name: Polygon Labs, ats: ashby, token: polygon-labs, tier: 2}
   - {name: 0x, ats: ashby, token: 0x, tier: 2}
-  - {name: Zerion, ats: ashby, token: zerion, tier: 2}
+  - {name: Zerion, ats: lever, token: zerion, tier: 2}
 
   # --- AI model evaluation / data vendors (separate, non-crypto income line) ---
   - {name: Handshake AI, ats: greenhouse, token: handshake, tier: 1, category: ai_eval}
   - {name: Mercor, ats: ashby, token: mercor, tier: 1, category: ai_eval}
   - {name: Scale AI / Outlier, ats: greenhouse, token: scaleai, tier: 1, category: ai_eval}
-  - {name: Surge AI, ats: greenhouse, token: surgeai, tier: 1, category: ai_eval}
-  - {name: DataAnnotation, ats: greenhouse, token: dataannotation, tier: 1, category: ai_eval}
+  - {name: Surge AI, ats: ashby, token: surge-ai, tier: 1, category: ai_eval}
+  # - {name: DataAnnotation, ats: greenhouse, token: dataannotation, tier: 1, category: ai_eval}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
   - {name: Labelbox / Alignerr, ats: lever, token: labelbox, tier: 1, category: ai_eval}
-  - {name: Micro1, ats: ashby, token: micro1, tier: 1, category: ai_eval}
+  # - {name: Micro1, ats: ashby, token: micro1, tier: 1, category: ai_eval}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
   - {name: Turing, ats: greenhouse, token: turing, tier: 1, category: ai_eval}
   - {name: Invisible Technologies, ats: greenhouse, token: invisibletech, tier: 1, category: ai_eval}
   - {name: Snorkel AI, ats: greenhouse, token: snorkelai, tier: 1, category: ai_eval}
-  - {name: Prolific, ats: ashby, token: prolific, tier: 1, category: ai_eval}
+  - {name: Prolific, ats: greenhouse, token: prolific, tier: 1, category: ai_eval}
   - {name: Toloka, ats: greenhouse, token: toloka, tier: 1, category: ai_eval}
-  - {name: Appen, ats: greenhouse, token: appen, tier: 1, category: ai_eval}
-  - {name: Sepal AI, ats: ashby, token: sepalai, tier: 1, category: ai_eval}
-  - {name: Datacurve, ats: ashby, token: datacurve, tier: 1, category: ai_eval}
+  - {name: Appen, ats: lever, token: appen, tier: 1, category: ai_eval}
+  # - {name: Sepal AI, ats: ashby, token: sepalai, tier: 1, category: ai_eval}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
+  # - {name: Datacurve, ats: ashby, token: datacurve, tier: 1, category: ai_eval}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
