@@ -75,3 +75,42 @@ README.md — what it does, setup (BotFather token, getting chat id, adding repo
 ```
 
 Keep code simple and readable; no frameworks beyond the listed libs.
+
+## v1.1 — Target-company watchlist (personal-assistant mode)
+
+Goal: catch roles at companies the owner actually wants, straight from their career pages, within hours of posting (less competition than job boards).
+
+- New source `bot/sources/watchlist.py` (kind `job`, source name `watchlist`), driven by `config/watchlist.yaml`:
+  ```yaml
+  companies:
+    - {name: Dune, ats: ashby, token: dune, tier: 1}
+    - {name: Messari, ats: greenhouse, token: messari, tier: 2}
+  ```
+  `tier` 1 = dream company, 2 = strong interest.
+- ATS public endpoints (no auth):
+  - greenhouse: `https://boards-api.greenhouse.io/v1/boards/{token}/jobs?content=true` → `jobs[]`: id, title, absolute_url, location.name, updated_at, content (HTML, html-unescape then strip tags).
+  - lever: `https://api.lever.co/v0/postings/{token}?mode=json` → array: id, text (title), hostedUrl, categories.location, categories.team, createdAt (ms epoch), descriptionPlain.
+  - ashby: `https://api.ashbyhq.com/posting-api/job-board/{token}?includeCompensation=true` → `jobs[]`: id, title, jobUrl, location, publishedAt, descriptionPlain, isRemote, compensation.compensationTierSummary (string, may be absent).
+- One company failing (404, bad token) must not fail the source: log `watchlist company=NAME ats=X status=404` and continue; raise only if all fail.
+- Pre-filter so we don't score hundreds of irrelevant roles: keep a title only if it matches a role keyword list in watchlist.yaml (`role_keywords`: engineer, developer, python, data, analyst, analytics, research, quant, treasury, finance, strategy, ai, ml, automation, full stack, backend, bot, integrations, solutions) and doesn't match `exclude_keywords` (sales, account executive, recruiter, legal, counsel, marketing, designer, hr, people, office, executive assistant, intern unless the owner adds it).
+- Item.tags gets `target`, `tier1`/`tier2`. Org = company name.
+- Scoring: target-company items get +15 (tier 1) / +8 (tier 2) on the final score, capped at 100. Alert format starts with `🎯 Target company` for these.
+- Alerts for target items also include a short "next step" line: "Apply within 24h; look for a referral from someone on the team" (static text, no LLM).
+- Seed `config/watchlist.yaml` with ~40 crypto companies that fit the owner (data/analytics, AI, bots/infra, DeFi risk/treasury, funds). Guess ATS+token from the company's careers URL patterns; it's fine if some are wrong, the run log will show which 404 so they can be fixed. Include at least: Dune, Nansen, Messari, Chainalysis, Kaiko, Token Terminal, Artemis, Allium, Flipside, Coin Metrics, Gauntlet, Chaos Labs, Galaxy, Wintermute, Paradigm, Coinbase, Kraken, Uniswap Labs, Aave Labs, Alchemy, Phantom, Fireblocks, Chainlink Labs, Offchain Labs, OP Labs, Consensys, Ondo, Ethena, Eigen Labs, Steakhouse Financial, karpatkey, LlamaRisk, Anchorage Digital, Circle, Ledger, MetaMask/Consensys, Lido, Polygon Labs, 0x, Zerion.
+- Add a CLI flag `--check-watchlist` that just hits every company endpoint and prints `name ats token status count` then exits (no scoring/alerts/db). Add a workflow `check-watchlist.yml` (workflow_dispatch only) that runs it.
+- Enable `watchlist` in sources.yaml. README: section on editing the watchlist.
+- Tests with fixtures for each ATS, the keyword pre-filter, the tier boost, and one-company-404 handling.
+
+### v1.1 addition — AI model evaluation gigs
+Owner has AI model evaluation / task-building experience (Handshake AI: Project Dynamo, Project Lever). This is a separate income line, not crypto-only.
+- Add to `config/profile.yaml` priority skills: "AI model evaluation", "RLHF / eval task design", "LLM red-teaming", "coding eval tasks (Python/TS/Solidity)". Add a 6th package: "AI eval & task building" (contract, est. $40–100/hr depending on domain expertise).
+- Add a second group in `config/watchlist.yaml` with `category: ai_eval` (tier 1): Handshake AI, Mercor, Scale AI / Outlier, Surge AI, DataAnnotation, Labelbox / Alignerr, Micro1, Turing, Invisible Technologies, Snorkel AI, Prolific, Toloka, Appen, Sepal AI, Anthropic/OpenAI-adjacent eval vendors if they have public boards. Guess ATS tokens; the check run will show which work.
+- For `ai_eval` companies, `role_keywords` also include: evaluator, annotator, rater, trainer, rlhf, red team, tutor, expert, specialist, contributor, freelance, contract. Remote/contract roles score well even without crypto keywords; crypto/DeFi/Solidity/Python-domain eval roles get an extra +10 (domain-expert evals pay more).
+- Tag these items `ai_eval`; alert header `🧪 AI eval gig`.
+
+### v1.1 fixes from the first live run (2026-10-12, GitHub Actions dry run)
+All 7 sources worked: cryptocurrencyjobs 55, cryptojobslist 100, remoteok 48, superteam 18, telegram 20, snapshot 8, discourse 14 = 263 items. But the rule score is miscalibrated: 0 items reached 70, and irrelevant jobs ("Regional Managing Director – Little Caesars Pizza", "Flight Coordinator – Starlink Aviation", "Media Specialist – DSW") scored 50.
+- RemoteOK `tag=crypto` returns non-crypto jobs: keep a RemoteOK item only if title/tags/description mention a crypto term (crypto, web3, blockchain, defi, onchain/on-chain, ethereum, solana, token, dao, stablecoin, wallet, nft, bitcoin).
+- Rule score must start low (e.g. 20) and be earned: items with zero priority/secondary skill matches and no analyst/treasury/ai_eval match must end below 40. Strong matches (e.g. "Python", "data analyst", "bot", "AI", "on-chain analyst", "treasury") should be able to reach 70+ without the LLM. Use word-boundary matching (so "ai" doesn't match "maintain").
+- Add `--top N` flag: after scoring, print the top N items with score, reason/matched keywords, source, title, org (works with --dry-run), so scoring can be calibrated from live runs. Make the workflow's dry_run mode pass `--top 30`.
+- Tests asserting the junk titles above score < 40 and e.g. "Python Data Analyst – Nansen" scores ≥ 70.
