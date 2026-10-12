@@ -37,36 +37,76 @@ def pay_vs_floor(item: Item, profile: dict) -> str | None:
     return "above" if top >= ref else "below"
 
 
-def rule_score(item: Item, profile: dict) -> tuple[int, str]:
-    text = " ".join([item.title, item.description, " ".join(item.tags)]).lower()
-    title = item.title.lower()
-    score, why = 20, []
+META_TAGS = {"target", "tier1", "tier2", "ai_eval"}
+TIER_BOOST = {"tier1": 15, "tier2": 8}
+BASE = 20
+NO_MATCH_CAP = 35  # nothing relevant matched: must stay well below the digest threshold
+REMOTE_WORDS = ["remote", "contract", "freelance", "contractor"]
 
-    pri = _hits(text, profile.get("priority_skills", []))
-    if pri:
-        score += min(len(pri) * 10, 40)
-        why.append("skills: " + ", ".join(pri[:4]))
+
+def target_boost(item: Item) -> int:
+    return max((v for k, v in TIER_BOOST.items() if k in item.tags), default=0)
+
+
+def rule_score(item: Item, profile: dict) -> tuple[int, str]:
+    tags = [t for t in item.tags if t not in META_TAGS]
+    text = " ".join([item.title, item.description, " ".join(tags)]).lower()
+    title = item.title.lower()
+    score, why = BASE, []
+    matched = False
+
+    # skills in the title count a lot; mentions only in the description/tags count a little
+    pri_words = profile.get("priority_skills", [])
+    pri_title = _hits(title, pri_words)
+    pri_body = [w for w in _hits(text, pri_words) if w not in pri_title]
+    if pri_title:
+        score += min(len(pri_title) * 25, 50)
+    if pri_body:
+        score += min(len(pri_body) * 5, 10)
+    if pri_title or pri_body:
+        matched = True
+        why.append("skills: " + ", ".join((pri_title + pri_body)[:4]))
     sec = _hits(text, profile.get("secondary_skills", []))
     if sec:
+        matched = True
         score += min(len(sec) * 4, 8)
         why.append("secondary: " + ", ".join(sec[:3]))
-    bonus = _hits(title, profile.get("bonus_keywords", [])) or (
+    bonus_title = _hits(title, profile.get("bonus_keywords", []))
+    bonus = bonus_title or (
         _hits(text, profile.get("bonus_keywords", [])) if item.kind == "lead" else []
     )
     if bonus:
-        score += 15
+        matched = True
+        score += 30 if bonus_title else 15
         why.append("analyst/treasury fit")
+    if "ai_eval" in item.tags:
+        matched = True
+        score += 25
+        why.append("AI eval vendor")
+        ev = _hits(title, profile.get("ai_eval_keywords", []))
+        if ev:
+            score += 15
+            why.append("eval role: " + ", ".join(ev[:2]))
+        if _hits(text, REMOTE_WORDS):
+            score += 10
+            why.append("remote/contract")
+        dom = _hits(text, profile.get("ai_eval_domain_keywords", []))
+        if dom:
+            score += 10
+            why.append("domain eval: " + ", ".join(dom[:2]))
     avoid = _hits(title, profile.get("avoid_keywords", []))
     if avoid:
         score -= 25
         why.append("avoid: " + ", ".join(avoid[:2]))
-    if item.kind == "lead":
+    if not matched:
+        score = min(score, NO_MATCH_CAP)
+    elif item.kind == "lead":
         score += 5
     pay = pay_vs_floor(item, profile)
     if pay == "below":
         score -= 15
         why.append("pay below floor")
-    elif pay == "above":
+    elif pay == "above" and matched:
         score += 10
         why.append("pay above floor")
     score = max(0, min(100, score))
@@ -77,11 +117,19 @@ def score_items(items: list[Item], profile: dict, cfg: dict | None = None) -> No
     """Set score / score_reason / package on each item (in place)."""
     for it in items:
         it.score, it.score_reason = rule_score(it, profile)
-    if not llm.available() or not items:
-        return
+    if llm.available() and items:
+        _llm_refine(items, profile, cfg)
+    for it in items:  # target-company boost applies to the final score
+        boost = target_boost(it)
+        if boost:
+            it.score = min(100, (it.score or 0) + boost)
+            it.score_reason += f"; target company +{boost}"
+
+
+def _llm_refine(items: list[Item], profile: dict, cfg: dict | None) -> None:
     cfg = cfg or {}
     batch = int(cfg.get("thresholds", {}).get("llm_batch_size", 10))
-    model = cfg.get("models", {}).get("scoring", llm.SCORING_MODEL)
+    model = llm.model_for("score", cfg)
     for i in range(0, len(items), batch):
         chunk = items[i : i + batch]
         try:

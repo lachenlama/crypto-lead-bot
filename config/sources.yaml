@@ -6,6 +6,7 @@ enabled:
   telegram_channels: true
   snapshot: true
   discourse: true
+  watchlist: true        # config/watchlist.yaml (Greenhouse/Lever/Ashby)
   web3career: false      # needs WEB3_CAREER_TOKEN
 
 telegram_channels:
@@ -40,5 +41,8 @@ thresholds:
   huge_pay_usd: 20000
 
 models:
-  scoring: claude-haiku-5-5
+  scoring: claude-haiku-5-5          # Anthropic path (ANTHROPIC_API_KEY)
   pitch: claude-sonnet-5-5
+  openai_score: openai/gpt-4o-mini   # OpenAI-compatible path (LLM_API_KEY); editable placeholder
+  openai_pitch: openai/gpt-4o        # editable placeholder
+  # env LLM_SCORE_MODEL / LLM_PITCH_MODEL override whichever path is active

@@ -1,4 +1,5 @@
-"""Pipeline entrypoint: python -m bot.main [--dry-run] [--source NAME] [--limit N]."""
+"""Pipeline entrypoint: python -m bot.main [--dry-run] [--source NAME] [--limit N]
+[--top N] [--check-watchlist]."""
 from __future__ import annotations
 
 import argparse
@@ -8,7 +9,7 @@ import sys
 from . import db, pitch, scam, score
 from .config import DB_PATH, load_profile, load_sources_config
 from .models import Item
-from .sources import SOURCES
+from .sources import SOURCES, watchlist
 from .telegram import Notifier, format_alert, format_digest
 
 log = logging.getLogger("bot")
@@ -29,6 +30,19 @@ def fetch_all(names: list[str], cfg: dict, limit: int | None) -> tuple[list[tupl
             st["errors"] += 1
             log.error("source %s failed: %s: %s", name, type(e).__name__, str(e)[:200])
     return items, stats
+
+
+def print_top(items: list[Item], n: int) -> None:
+    """Print the top-N scored items (for calibrating scoring from live runs)."""
+    for it in sorted(items, key=lambda i: i.score or 0, reverse=True)[:n]:
+        print(f"{it.score:>3} | {it.score_reason} | {it.source} | {it.title} | {it.org}")
+    print("-" * 40)
+
+
+def check_watchlist() -> int:
+    for name, ats, token, status, count in watchlist.check():
+        print(f"{name} {ats} {token} {status} {'-' if count is None else count}")
+    return 0
 
 
 def run(args: argparse.Namespace) -> int:
@@ -70,9 +84,12 @@ def run(args: argparse.Namespace) -> int:
     top = sorted(new, key=lambda i: i.score or 0, reverse=True)[:max_instant]
     pitch.draft_pitches(top, profile, cfg)
 
+    new.sort(key=lambda i: i.score or 0, reverse=True)
+    if args.top:
+        print_top(new, args.top)
+
     # 6. alerts
     notifier = Notifier(dry_run=args.dry_run)
-    new.sort(key=lambda i: i.score or 0, reverse=True)
     # cap instant alerts so a first run (empty db) doesn't flood the chat
     instant = [i for i in new if (i.score or 0) >= alert_min][:max_instant]
     mid = [i for i in new if digest_min <= (i.score or 0) < alert_min][:digest_size]
@@ -107,10 +124,15 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--dry-run", action="store_true", help="no Telegram, no DB writes")
     p.add_argument("--source", help="run only this source")
     p.add_argument("--limit", type=int, help="max items per source")
+    p.add_argument("--top", type=int, help="print the top N scored items (works with --dry-run)")
+    p.add_argument("--check-watchlist", action="store_true",
+                   help="hit every watchlist endpoint, print name ats token status count, exit")
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)  # httpx logs URLs
     try:
+        if args.check_watchlist:
+            return check_watchlist()
         return run(args)
     except Exception:
         log.exception("fatal error")

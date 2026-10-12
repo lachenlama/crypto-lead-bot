@@ -1,4 +1,4 @@
-"""Pitch drafting step (skipped without ANTHROPIC_API_KEY)."""
+"""Pitch drafting step (skipped without an LLM key)."""
 from __future__ import annotations
 
 import logging
@@ -18,7 +18,7 @@ def draft_pitches(items: list[Item], profile: dict, cfg: dict | None = None) -> 
         return
     cfg = cfg or {}
     threshold = int(cfg.get("thresholds", {}).get("pitch", 70))
-    model = cfg.get("models", {}).get("pitch", llm.PITCH_MODEL)
+    model = llm.model_for("pitch", cfg)
     for it in items:
         if not needs_pitch(it, threshold):
             continue

@@ -7,6 +7,7 @@ from . import (
     snapshot,
     superteam,
     telegram_channels,
+    watchlist,
     web3career,
 )
 
@@ -20,6 +21,7 @@ SOURCES = {
         telegram_channels,
         snapshot,
         discourse,
+        watchlist,
         web3career,
     )
 }

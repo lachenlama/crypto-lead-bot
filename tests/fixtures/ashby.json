@@ -1,0 +1,12 @@
+{"jobs": [
+ {"id": "uuid-1", "title": "Python Data Analyst", "jobUrl": "https://jobs.ashbyhq.com/nansen/uuid-1",
+  "location": "Remote", "publishedAt": "2026-10-09T09:00:00.000+00:00", "isRemote": true,
+  "descriptionPlain": "Analyse on-chain data with Python.",
+  "compensation": {"compensationTierSummary": "$120K - $160K"}},
+ {"id": "uuid-2", "title": "AI Model Evaluator (Contract)", "jobUrl": "https://jobs.ashbyhq.com/nansen/uuid-2",
+  "location": "Remote", "publishedAt": "2026-10-09T09:00:00.000+00:00", "isRemote": true,
+  "descriptionPlain": "Evaluate model outputs."},
+ {"id": "uuid-3", "title": "Head of Marketing", "jobUrl": "https://jobs.ashbyhq.com/nansen/uuid-3",
+  "location": "London", "publishedAt": "2026-10-09T09:00:00.000+00:00", "isRemote": false,
+  "descriptionPlain": "Lead marketing."}
+]}

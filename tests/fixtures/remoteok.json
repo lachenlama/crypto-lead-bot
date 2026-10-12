@@ -1,3 +1,47 @@
-[{"legal":"https://remoteok.com/legal - please link back"},
-{"id":"111","position":"Python Bot Developer","company":"BotCo","tags":["python","crypto"],"description":"<p>Build Telegram bots</p>","salary_min":120000,"salary_max":160000,"url":"https://remoteok.com/remote-jobs/111","date":"2026-10-06T10:00:00+00:00"},
-{"id":"112","position":"Community Moderator","company":"X","tags":["community"],"description":"mod","salary_min":0,"salary_max":0,"url":"https://remoteok.com/remote-jobs/112","date":"2026-10-06T10:00:00+00:00"}]
+[
+  {
+    "legal": "https://remoteok.com/legal - please link back"
+  },
+  {
+    "id": "111",
+    "position": "Python Bot Developer",
+    "company": "BotCo",
+    "tags": [
+      "python",
+      "crypto"
+    ],
+    "description": "<p>Build Telegram bots for our crypto trading desk</p>",
+    "salary_min": 120000,
+    "salary_max": 160000,
+    "url": "https://remoteok.com/remote-jobs/111",
+    "date": "2026-10-06T10:00:00+00:00"
+  },
+  {
+    "id": "112",
+    "position": "Community Moderator",
+    "company": "X",
+    "tags": [
+      "community",
+      "web3"
+    ],
+    "description": "Moderate our web3 community",
+    "salary_min": 0,
+    "salary_max": 0,
+    "url": "https://remoteok.com/remote-jobs/112",
+    "date": "2026-10-06T10:00:00+00:00"
+  },
+  {
+    "id": "113",
+    "position": "Flight Coordinator",
+    "company": "Starlink Aviation",
+    "tags": [
+      "operations",
+      "crypto"
+    ],
+    "description": "<p>Coordinate flights.</p>",
+    "salary_min": 0,
+    "salary_max": 0,
+    "url": "https://remoteok.com/remote-jobs/113",
+    "date": "2026-10-06T10:00:00+00:00"
+  }
+]

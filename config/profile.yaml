@@ -14,10 +14,43 @@ priority_skills:
   - next.js
   - full stack
   - dashboard
+  - data analyst
+  - on-chain analyst
+  - on-chain
+  - treasury
+  - bot
+  - ai
+  - AI model evaluation
+  - RLHF / eval task design
+  - LLM red-teaming
+  - coding eval tasks (Python/TS/Solidity)
 secondary_skills:
   - solidity
   - evm
   - defi
+# AI model evaluation income line (Handshake AI: Project Dynamo, Project Lever); not crypto-only.
+# Rule scoring matches these (the skill names above are for the LLM / humans).
+ai_eval_keywords:
+  - evaluator
+  - model evaluation
+  - evals
+  - eval
+  - rlhf
+  - red team
+  - red-teaming
+  - annotator
+  - rater
+  - ai trainer
+  - ai tutor
+  - data labeling
+ai_eval_domain_keywords:   # domain-expert evals pay more
+  - crypto
+  - web3
+  - blockchain
+  - defi
+  - solidity
+  - python
+  - on-chain
 goal: >-
   Gain fund management / treasury experience to boost on-chain analyst,
   treasury, DAO finance and research analyst roles.
@@ -54,3 +87,5 @@ packages:
     price_range: "$1000-$3500"
   - name: full-stack dApp/internal tool
     price_range: "$2000-$6000"
+  - name: AI eval & task building
+    price_range: "$40-$100/hr"

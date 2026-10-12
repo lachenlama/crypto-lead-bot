@@ -1,0 +1,9 @@
+{"jobs": [
+ {"id": 4001, "title": "Senior Data Engineer", "absolute_url": "https://boards.greenhouse.io/messari/jobs/4001",
+  "location": {"name": "Remote"}, "updated_at": "2026-10-10T12:00:00-04:00",
+  "content": "&lt;p&gt;Build &lt;b&gt;pipelines&lt;/b&gt; in Python&lt;/p&gt;"},
+ {"id": 4002, "title": "Account Executive, Enterprise", "absolute_url": "https://boards.greenhouse.io/messari/jobs/4002",
+  "location": {"name": "NYC"}, "updated_at": "2026-10-10T12:00:00-04:00", "content": "&lt;p&gt;Sell&lt;/p&gt;"},
+ {"id": 4003, "title": "Office Manager", "absolute_url": "https://boards.greenhouse.io/messari/jobs/4003",
+  "location": {"name": "NYC"}, "updated_at": "2026-10-10T12:00:00-04:00", "content": ""}
+]}

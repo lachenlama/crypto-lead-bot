@@ -29,7 +29,11 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           WEB3_CAREER_TOKEN: ${{ secrets.WEB3_CAREER_TOKEN }}
-        run: python -m bot.main ${{ inputs.dry_run && '--dry-run' || '' }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ vars.LLM_BASE_URL }}
+          LLM_SCORE_MODEL: ${{ vars.LLM_SCORE_MODEL }}
+          LLM_PITCH_MODEL: ${{ vars.LLM_PITCH_MODEL }}
+        run: python -m bot.main ${{ inputs.dry_run && '--dry-run --top 30' || '' }}
       - name: Commit db
         run: |
           if [ -n "$(git status --porcelain data/leads.db)" ]; then

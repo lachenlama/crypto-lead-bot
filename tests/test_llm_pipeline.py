@@ -112,3 +112,59 @@ def test_all_sources_failing_exits_zero(monkeypatch, tmp_path):
     monkeypatch.setattr(botmain, "SOURCES", {"superteam": _Src("superteam", bad)})
     monkeypatch.setattr(botmain, "DB_PATH", tmp_path / "leads.db")
     assert botmain.main(["--dry-run"]) == 0
+
+
+def _router(monkeypatch, handler):
+    import httpx
+    monkeypatch.setenv("LLM_API_KEY", "k")
+    monkeypatch.delenv("LLM_BASE_URL", raising=False)
+    transport = httpx.MockTransport(handler)
+    real = httpx.post
+    monkeypatch.setattr(llm.httpx, "post", lambda url, **kw: httpx.Client(transport=transport).post(url, **kw))
+    return real
+
+
+def test_openai_compatible_success(monkeypatch):
+    import httpx
+    seen = []
+
+    def handler(req):
+        body = json.loads(req.content)
+        seen.append((str(req.url), req.headers["authorization"], body))
+        if body["model"] == "openai/gpt-4o-mini":
+            n = body["messages"][1]["content"].count("\n[") + 1
+            text = json.dumps([{"i": i, "score": 90, "reason": "r", "package": None} for i in range(n)])
+        else:
+            text = "Router pitch."
+        return httpx.Response(200, json={"choices": [{"message": {"content": text}}]})
+    _router(monkeypatch, handler)
+    assert llm.available() and llm.provider() == "openai"
+    it = Item(source="s", kind="gig", external_id="1", title="Python bot")
+    score.score_items([it], load_profile(), {})
+    assert it.score > 60
+    url, auth, body = seen[0]
+    assert url == "https://openrouter.ai/api/v1/chat/completions" and auth == "Bearer k"
+    assert body["messages"][0]["role"] == "system" and body["max_tokens"]
+    assert llm.draft_pitch(it, load_profile(), llm.model_for("pitch")) == "Router pitch."
+    assert seen[-1][2]["model"] == "openai/gpt-4o"
+
+
+def test_openai_compatible_500_falls_back_to_rules(monkeypatch):
+    import httpx
+    _router(monkeypatch, lambda req: httpx.Response(500))
+    it = Item(source="s", kind="job", external_id="1", title="Python bot")
+    rule, _ = score.rule_score(it, load_profile())
+    score.score_items([it], load_profile(), {})
+    assert it.score == rule and it.package is None
+
+
+def test_model_selection(monkeypatch):
+    cfg = {"models": {"scoring": "a", "pitch": "b", "openai_score": "c", "openai_pitch": "d"}}
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "x")
+    assert (llm.model_for("score", cfg), llm.model_for("pitch", cfg)) == ("a", "b")
+    monkeypatch.setenv("LLM_API_KEY", "y")  # router wins when both are set
+    monkeypatch.setenv("LLM_BASE_URL", "https://r.example/v1")
+    assert (llm.model_for("score", cfg), llm.model_for("pitch", cfg)) == ("c", "d")
+    monkeypatch.setenv("LLM_SCORE_MODEL", "env-m")
+    assert llm.model_for("score", cfg) == "env-m"
+    assert llm.model_for("pitch", {}) == "openai/gpt-4o"

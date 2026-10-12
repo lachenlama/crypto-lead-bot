@@ -16,5 +16,5 @@ def fx():
 
 @pytest.fixture(autouse=True)
 def clean_env(monkeypatch):
-    for k in ("ANTHROPIC_API_KEY", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"):
+    for k in ("ANTHROPIC_API_KEY", "LLM_API_KEY", "LLM_BASE_URL", "LLM_SCORE_MODEL", "LLM_PITCH_MODEL", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"):
         monkeypatch.delenv(k, raising=False)

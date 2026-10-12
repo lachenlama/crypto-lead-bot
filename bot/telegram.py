@@ -45,9 +45,17 @@ def fmt_pay(it: Item) -> str:
     return f"{rng} {it.pay_currency} /{it.pay_unit}".strip()
 
 
+NEXT_STEP = "Apply within 24h; look for a referral from someone on the team"
+
+
 def format_alert(it: Item) -> str:
     e = html.escape
-    lines = [f"<b>{e(it.title)}</b>"]
+    lines = []
+    if "ai_eval" in it.tags:
+        lines.append("🧪 AI eval gig")
+    elif "target" in it.tags:
+        lines.append("🎯 Target company")
+    lines.append(f"<b>{e(it.title)}</b>")
     lines.append(f"{e(it.org or 'unknown org')} | {e(it.kind)} | {e(it.source)}")
     lines.append(f"Pay: {e(fmt_pay(it))}" + (f" | Deadline: {e(it.deadline)}" if it.deadline else ""))
     lines.append(f"Score: <b>{it.score}</b> - {e(it.score_reason)}")
@@ -56,6 +64,8 @@ def format_alert(it: Item) -> str:
     if it.scam_flags:
         lines.append("⚠️ Warning: " + e("; ".join(it.scam_flags)))
     lines.append(e(it.url))
+    if "target" in it.tags:
+        lines.append(f"Next step: {NEXT_STEP}")
     base = "\n".join(lines)
     if it.pitch:
         room = SAFE - len(base) - 40

@@ -31,6 +31,10 @@ def load_sources_config() -> dict[str, Any]:
     return _load("sources.yaml")
 
 
+def load_watchlist() -> dict[str, Any]:
+    return _load("watchlist.yaml")
+
+
 def env(name: str) -> str | None:
     v = os.environ.get(name)
     return v or None
