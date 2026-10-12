@@ -85,8 +85,11 @@ def run(args: argparse.Namespace) -> int:
             alerted.extend(mid)
 
     # 7. persist
-    if not args.dry_run and conn is not None:
-        alerted_keys = {i.key for i in alerted} if not notifier.dry_run else set()
+    # without Telegram configured, don't mark anything as seen, so these items still alert once it is
+    if notifier.dry_run and not args.dry_run:
+        log.warning("telegram not configured: printed alerts only, db not updated")
+    if not notifier.dry_run and conn is not None:
+        alerted_keys = {i.key for i in alerted}
         for it in new:
             db.save_item(conn, it, alerted=it.key in alerted_keys)
         conn.commit()

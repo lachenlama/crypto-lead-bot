@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: "0 */4 * * *"
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Print alerts only, don't send or save"
+        type: boolean
+        default: false
 permissions:
   contents: write
 concurrency:
@@ -24,7 +29,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           WEB3_CAREER_TOKEN: ${{ secrets.WEB3_CAREER_TOKEN }}
-        run: python -m bot.main
+        run: python -m bot.main ${{ inputs.dry_run && '--dry-run' || '' }}
       - name: Commit db
         run: |
           if [ -n "$(git status --porcelain data/leads.db)" ]; then

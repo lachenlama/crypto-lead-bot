@@ -83,11 +83,27 @@ def test_pipeline_dry_run(monkeypatch, capsys, tmp_path):
 def test_pipeline_real_run_dedupes(monkeypatch, capsys, tmp_path):
     monkeypatch.setattr(botmain, "SOURCES", {"superteam": _Src("superteam", lambda cfg=None: _items())})
     monkeypatch.setattr(botmain, "DB_PATH", tmp_path / "leads.db")
+    sent = []
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "t")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "c")
+    monkeypatch.setattr("bot.telegram.Notifier._post", lambda self, text: sent.append(text) or True)
+    monkeypatch.setattr("bot.telegram.time.sleep", lambda s: None, raising=False)
     assert botmain.main([]) == 0
-    first = capsys.readouterr().out
+    first = len(sent)
     assert first
     assert botmain.main([]) == 0
-    assert capsys.readouterr().out == ""  # nothing new second time
+    assert len(sent) == first  # nothing new second time
+
+
+def test_pipeline_without_telegram_does_not_mark_seen(monkeypatch, capsys, tmp_path):
+    monkeypatch.setattr(botmain, "SOURCES", {"superteam": _Src("superteam", lambda cfg=None: _items())})
+    monkeypatch.setattr(botmain, "DB_PATH", tmp_path / "leads.db")
+    monkeypatch.delenv("TELEGRAM_BOT_TOKEN", raising=False)
+    monkeypatch.delenv("TELEGRAM_CHAT_ID", raising=False)
+    assert botmain.main([]) == 0
+    assert capsys.readouterr().out
+    assert botmain.main([]) == 0
+    assert capsys.readouterr().out  # still printed: items weren't marked seen
 
 
 def test_all_sources_failing_exits_zero(monkeypatch, tmp_path):
