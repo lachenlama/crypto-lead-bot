@@ -171,3 +171,19 @@ def test_top_flag_prints(monkeypatch, capsys, tmp_path):
     out = capsys.readouterr().out
     assert " | superteam | Python Telegram bot" in out
     assert not (tmp_path / "leads.db").exists()
+
+
+def test_ai_eval_tag_only_for_eval_titles(monkeypatch):
+    from bot.sources import watchlist as wlmod
+    co = {"name": "EvalCo", "ats": "greenhouse", "token": "evalco", "tier": 1, "category": "ai_eval"}
+    wl = {"companies": [co], "role_keywords": ["engineer", "research"],
+          "ai_eval_role_keywords": ["expert", "rater"], "exclude_keywords": []}
+    data = {"jobs": [
+        {"id": 1, "title": "Research Scientist", "absolute_url": "u1", "content": ""},
+        {"id": 2, "title": "Python Expert (Contract)", "absolute_url": "u2", "content": ""},
+    ]}
+    monkeypatch.setattr(wlmod, "load_watchlist", lambda: wl)
+    monkeypatch.setattr(wlmod, "fetch_company", lambda c, company: wlmod.parse_greenhouse(data, company))
+    items = {i.title: i for i in wlmod.fetch()}
+    assert "ai_eval" not in items["Research Scientist"].tags
+    assert "ai_eval" in items["Python Expert (Contract)"].tags

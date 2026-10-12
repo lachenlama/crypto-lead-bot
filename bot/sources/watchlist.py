@@ -137,7 +137,15 @@ def fetch(cfg: dict | None = None) -> list[Item]:
                 failed += 1
                 log.warning("watchlist company=%s ats=%s status=%s", co.get("name"), co.get("ats"), _status(e))
                 continue
-            items.extend(it for it in got if title_ok(it.title, co, wl))
+            kept = [it for it in got if title_ok(it.title, co, wl)]
+            if co.get("category") == "ai_eval":
+                # staff roles at eval vendors (e.g. "Research Scientist") are ordinary target jobs;
+                # only eval-type titles (rater, annotator, expert contributor...) count as AI eval gigs
+                ev = _words_re(wl.get("ai_eval_role_keywords", []))
+                for it in kept:
+                    if not (ev and ev.search(re.sub(r"[-/_,()]", " ", it.title.lower()))):
+                        it.tags.remove("ai_eval")
+            items.extend(kept)
     if companies and failed == len(companies):
         raise RuntimeError("watchlist: all companies failed")
     return items

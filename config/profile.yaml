@@ -59,7 +59,8 @@ bonus_keywords:       # analyst / treasury / fund roles get a bonus
   - treasury
   - fund
   - dao finance
-  - research
+  - research analyst
+  - crypto research
   - portfolio
 avoid_keywords:       # penalised (low priority, not excluded)
   - auditor
