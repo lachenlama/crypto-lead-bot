@@ -8,6 +8,7 @@ import time
 
 import httpx
 
+from . import location
 from .models import Item
 
 log = logging.getLogger(__name__)
@@ -58,6 +59,7 @@ def format_alert(it: Item) -> str:
     lines.append(f"<b>{e(it.title)}</b>")
     lines.append(f"{e(it.org or 'unknown org')} | {e(it.kind)} | {e(it.source)}")
     lines.append(f"Pay: {e(fmt_pay(it))}" + (f" | Deadline: {e(it.deadline)}" if it.deadline else ""))
+    lines.append(e(location.alert_line(it)))
     lines.append(f"Score: <b>{it.score}</b> - {e(it.score_reason)}")
     if it.package:
         lines.append(f"Package: {e(it.package)}")
@@ -82,7 +84,7 @@ def format_digest(items: list[Item]) -> str:
     lines = [f"<b>Digest: {len(items)} more leads (score 50-69)</b>"]
     for it in items:
         warn = " ⚠️" if it.scam_flags else ""
-        lines.append(f"{it.score} | <a href=\"{e(it.url, quote=True)}\">{e(it.title[:80])}</a> - {e(it.org or it.source)}{warn}")
+        lines.append(f"{location.emoji(it)} {it.score} | <a href=\"{e(it.url, quote=True)}\">{e(it.title[:80])}</a> - {e(it.org or it.source)}{warn}")
     return "\n".join(lines)
 
 

@@ -80,3 +80,13 @@ evals. `config/profile.yaml` has the matching skills and the "AI eval & task bui
 3. Enable it under `enabled:` in `config/sources.yaml`.
 4. Add a small fixture in `tests/fixtures/` and a parser test.
 A failing source is caught and logged; it never breaks the run.
+
+## Location filter
+
+The owner is in India (IST) and prefers remote roles. `bot/location.py` classifies every item from its
+location text (the `Location:` line on watchlist/RemoteOK items, else title/description): `open`
+(worldwide remote, +10), `remote_west` (remote limited to US/EU/UK/Canada, +10), `india_apac` (+0),
+`contract_ok` (freelance/contract in one region, +5 if US/EU/UK), `restricted` (remote limited to another
+region, score capped at 45), `onsite` (a city, no remote, capped at 30) and `unknown` (no change).
+Gigs and DAO leads are never capped. Each alert carries a `📍` line and digest lines an emoji.
+Edit the lexicons at the top of `bot/location.py` to tune it.

@@ -1,4 +1,5 @@
 # Owner profile. Edit freely; used by rule scoring and sent to the LLM.
+location: {country: India, region: APAC, timezone: "UTC+5:30"}
 priority_skills:
   - python
   - on-chain analytics

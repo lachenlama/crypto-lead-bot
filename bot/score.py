@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 import re
 
-from . import llm
+from . import llm, location
 from .models import Item
 
 log = logging.getLogger(__name__)
@@ -133,6 +133,10 @@ def score_items(items: list[Item], profile: dict, cfg: dict | None = None) -> No
         if boost:
             it.score = min(100, (it.score or 0) + boost)
             it.score_reason += f"; target company +{boost}"
+        bonus, why = location_bonus(it)
+        if bonus:
+            it.score = min(100, (it.score or 0) + bonus)
+            it.score_reason += f"; {why} +{bonus}"
         cap, why = fit_cap(it, profile)
         if cap is not None and (it.score or 0) > cap:
             it.score = cap
@@ -143,11 +147,31 @@ def fit_cap(item: Item, profile: dict) -> tuple[int | None, str]:
     """Hard ceiling for roles the owner can't realistically get: senior titles stay out of instant
     alerts (digest at most), language-specific roles are effectively dropped."""
     title = item.title.lower()
+    caps: list[tuple[int, str]] = []
     if _hits(title, profile.get("language_role_keywords", [])):
-        return 40, "language-specific role"
+        caps.append((40, "language-specific role"))
     if _hits(title, profile.get("seniority_keywords", [])):
-        return 60, "senior title"
-    return None, ""
+        caps.append((60, "senior title"))
+    if item.kind == "job":  # DAO leads and gigs are never capped by location
+        status, label = location.classify(item)
+        if status == location.RESTRICTED:
+            caps.append((LOCATION_CAPS[status], f"remote limited to {label}"))
+        elif status == location.ONSITE:
+            caps.append((LOCATION_CAPS[status], f"onsite {label}"))
+    return min(caps) if caps else (None, "")
+
+
+LOCATION_CAPS = {location.RESTRICTED: 45, location.ONSITE: 30}
+
+
+def location_bonus(item: Item) -> tuple[int, str]:
+    """Owner prefers worldwide / US-EU-UK remote roles; contract roles in the West get a small bump."""
+    status, label = location.classify(item)
+    if status in (location.OPEN, location.REMOTE_WEST):
+        return 10, f"remote {label}"
+    if status == location.CONTRACT_OK and location.is_west(label):
+        return 5, f"contract {label}"
+    return 0, ""
 
 
 def _llm_refine(items: list[Item], profile: dict, cfg: dict | None) -> None:

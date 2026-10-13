@@ -43,6 +43,8 @@ def parse(data: list) -> list[Item]:
         lo, hi = _num(row.get("salary_min")), _num(row.get("salary_max"))
         url = row.get("url") or row.get("apply_url") or ""
         desc = clean_text(row.get("description"), 1900) + f"\n{ATTRIBUTION}"
+        if (row.get("location") or "").strip():
+            desc = f"Location: {row['location'].strip()}\n{desc}"
         items.append(
             Item(
                 source=NAME,
