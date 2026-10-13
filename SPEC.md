@@ -114,3 +114,21 @@ All 7 sources worked: cryptocurrencyjobs 55, cryptojobslist 100, remoteok 48, su
 - Rule score must start low (e.g. 20) and be earned: items with zero priority/secondary skill matches and no analyst/treasury/ai_eval match must end below 40. Strong matches (e.g. "Python", "data analyst", "bot", "AI", "on-chain analyst", "treasury") should be able to reach 70+ without the LLM. Use word-boundary matching (so "ai" doesn't match "maintain").
 - Add `--top N` flag: after scoring, print the top N items with score, reason/matched keywords, source, title, org (works with --dry-run), so scoring can be calibrated from live runs. Make the workflow's dry_run mode pass `--top 30`.
 - Tests asserting the junk titles above score < 40 and e.g. "Python Data Analyst – Nansen" scores ≥ 70.
+
+## v1.2 — Location eligibility (owner is in India, IST / UTC+5:30)
+
+Goal: only alert on roles the owner can actually take from India, and say so on every alert. Don't hide or change the owner's real location anywhere; this is purely about filtering by eligibility.
+
+- `config/profile.yaml`: add `location: {country: India, region: APAC, timezone: "UTC+5:30"}`.
+- New `bot/location.py` with `classify(item) -> (status, label)` using the item's location text (the `Location:` line watchlist sources prepend, RemoteOK `location`, and title/description text). Statuses:
+  - `open` — worldwide / anywhere / global remote / "remote (any)" / APAC / Asia / India / an Indian city (Bengaluru, Bangalore, Mumbai, Delhi, NCR, Gurugram, Gurgaon, Noida, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad) / UTC+5:30 or IST timezone ranges / "timezone: UTC±N" ranges that include +5:30.
+  - `contract_ok` — the role is freelance / contract / contractor / bounty / gig AND the location is a single region (e.g. "European Union", "United States"). Contractors are often hired across borders, so keep these but mark "check if they accept contractors from India".
+  - `restricted` — remote but limited to another country or region (US-only, "United States - Remote", EU/EEA/UK only, "must be authorized to work in …", "must reside in …").
+  - `onsite` — a specific non-Indian city/country with no remote mention (e.g. "New York City", "London", "San Francisco, CA").
+  - `unknown` — no location info (most job-board RSS, Superteam, DAO leads).
+  - If text mentions "visa sponsorship" or "relocation" for an onsite role, keep `onsite` but add "(offers relocation/visa)" to the label.
+- Scoring (applied in `score.fit_cap` after the target boost, like the seniority cap): `open` +10 (cap 100); `contract_ok` no change; `unknown` no change; `restricted` cap 45; `onsite` cap 40 (cap 55 if relocation/visa mentioned). DAO leads and gigs (`kind` lead/gig) are never capped by location.
+- Alerts (`telegram.format_alert`): add a line `📍 Open to India ✅` / `📍 Contractor role in <region>: check they accept India ⚠️` / `📍 <region> only ❌` / `📍 Onsite <city> ❌` / `📍 Location not stated ❔`. Digest lines get a short emoji prefix from the same status.
+- Watchlist: add an `apac` group (tier 2) of crypto companies with big India/APAC teams, guessing ATS + token (the `--check-watchlist` run will validate; comment out any that 404 after that run): CoinDCX, CoinSwitch, Delta Exchange, Mudrex, Biconomy, Push Protocol, Router Protocol, Polygon (already present), OKX, Bybit, KuCoin, Animoca Brands, Matrixport, HashKey, Crypto.com, Gate, Bitget, Binance (if it has a public board), Avalanche/Ava Labs, Sei, Aptos Labs, Sui/Mysten Labs, Near Foundation, Celestia, Wormhole, LayerZero.
+- Tests: classifier cases for each status (use real strings seen in live data: "European Union", "United States - Remote (remote)", "Global - Remote", "Estonia - Remote; India - Remote; South Africa - Remote", "New York City", "Bengaluru, India", "Any, Transcription", "Remote - APAC"), the score caps, gigs/leads not capped, and the alert line.
+- README: a short "Location filter" section.
