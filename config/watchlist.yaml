@@ -112,29 +112,29 @@ companies:
   # - {name: Datacurve, ats: ashby, token: datacurve, tier: 1, category: ai_eval}  # no public Greenhouse/Lever/Ashby board found (2026-10-12)
 
   # --- apac: crypto companies with big India / APAC teams (tier 2); tokens are guesses ---
-  - {name: CoinDCX, ats: greenhouse, token: coindcx, tier: 2, category: apac}
-  - {name: CoinSwitch, ats: lever, token: coinswitch, tier: 2, category: apac}
-  - {name: Delta Exchange, ats: lever, token: deltaexchange, tier: 2, category: apac}
-  - {name: Mudrex, ats: lever, token: mudrex, tier: 2, category: apac}
-  - {name: Biconomy, ats: ashby, token: biconomy, tier: 2, category: apac}
-  - {name: Push Protocol, ats: ashby, token: push, tier: 2, category: apac}
-  - {name: Router Protocol, ats: lever, token: routerprotocol, tier: 2, category: apac}
-  - {name: OKX, ats: lever, token: okx, tier: 2, category: apac}
-  - {name: Bybit, ats: lever, token: bybit, tier: 2, category: apac}
-  - {name: KuCoin, ats: greenhouse, token: kucoin, tier: 2, category: apac}
-  - {name: Animoca Brands, ats: greenhouse, token: animocabrands, tier: 2, category: apac}
-  - {name: Matrixport, ats: lever, token: matrixport, tier: 2, category: apac}
-  - {name: HashKey, ats: lever, token: hashkey, tier: 2, category: apac}
-  - {name: Crypto.com, ats: ashby, token: crypto.com, tier: 2, category: apac}
+  # - {name: CoinDCX, ats: greenhouse, token: coindcx, tier: 2, category: apac}  # no public Greenhouse/Lever/Ashby board found (2026-10-13)
+  # - {name: CoinSwitch, ats: lever, token: coinswitch, tier: 2, category: apac}  # no public Greenhouse/Lever/Ashby board found (2026-10-13)
+  # - {name: Delta Exchange, ats: lever, token: deltaexchange, tier: 2, category: apac}  # no public Greenhouse/Lever/Ashby board found (2026-10-13)
+  # - {name: Mudrex, ats: lever, token: mudrex, tier: 2, category: apac}  # no public Greenhouse/Lever/Ashby board found (2026-10-13)
+  # - {name: Biconomy, ats: ashby, token: biconomy, tier: 2, category: apac}  # no public Greenhouse/Lever/Ashby board found (2026-10-13)
+  # - {name: Push Protocol, ats: ashby, token: push, tier: 2, category: apac}  # no public Greenhouse/Lever/Ashby board found (2026-10-13)
+  # - {name: Router Protocol, ats: lever, token: routerprotocol, tier: 2, category: apac}  # no public Greenhouse/Lever/Ashby board found (2026-10-13)
+  - {name: OKX, ats: greenhouse, token: okx, tier: 2, category: apac}
+  - {name: Bybit, ats: greenhouse, token: bybit, tier: 2, category: apac}
+  # - {name: KuCoin, ats: greenhouse, token: kucoin, tier: 2, category: apac}  # no public Greenhouse/Lever/Ashby board found (2026-10-13)
+  - {name: Animoca Brands, ats: lever, token: animocabrands, tier: 2, category: apac}
+  # - {name: Matrixport, ats: lever, token: matrixport, tier: 2, category: apac}  # no public Greenhouse/Lever/Ashby board found (2026-10-13)
+  # - {name: HashKey, ats: lever, token: hashkey, tier: 2, category: apac}  # no public Greenhouse/Lever/Ashby board found (2026-10-13)
+  - {name: Crypto.com, ats: lever, token: crypto, tier: 2, category: apac}
   - {name: Gate, ats: lever, token: gate, tier: 2, category: apac}
-  - {name: Bitget, ats: greenhouse, token: bitget, tier: 2, category: apac}
+  # - {name: Bitget, ats: greenhouse, token: bitget, tier: 2, category: apac}  # no public Greenhouse/Lever/Ashby board found (2026-10-13)
   - {name: Binance, ats: greenhouse, token: binance, tier: 2, category: apac}
-  - {name: Ava Labs, ats: lever, token: avalabs, tier: 2, category: apac}
-  - {name: Sei, ats: ashby, token: sei, tier: 2, category: apac}
+  - {name: Ava Labs, ats: ashby, token: ava-labs, tier: 2, category: apac}
+  - {name: Sei, ats: ashby, token: sei-labs, tier: 2, category: apac}
   - {name: Aptos Labs, ats: greenhouse, token: aptoslabs, tier: 2, category: apac}
-  - {name: Mysten Labs (Sui), ats: greenhouse, token: mystenlabs, tier: 2, category: apac}
+  - {name: Mysten Labs (Sui), ats: ashby, token: mystenlabs, tier: 2, category: apac}
   - {name: Near Foundation, ats: greenhouse, token: nearfoundation, tier: 2, category: apac}
-  - {name: Celestia, ats: ashby, token: celestia, tier: 2, category: apac}
-  - {name: Wormhole, ats: ashby, token: wormhole, tier: 2, category: apac}
-  - {name: LayerZero, ats: ashby, token: layerzerolabs, tier: 2, category: apac}
+  - {name: Celestia, ats: lever, token: celestia, tier: 2, category: apac}
+  - {name: Wormhole, ats: ashby, token: wormholelabs, tier: 2, category: apac}
+  - {name: LayerZero, ats: greenhouse, token: layerzerolabs, tier: 2, category: apac}
   # Polygon is already in the crypto group above (Polygon Labs).
