@@ -1,7 +1,9 @@
 name: run-bot
 on:
   schedule:
-    - cron: "0 */4 * * *"
+    # GitHub runs scheduled jobs best-effort and often delays or drops ones at :00 (peak load);
+    # an off-peak minute and a 2-hour interval make a missed slot cost less
+    - cron: "17 */2 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
