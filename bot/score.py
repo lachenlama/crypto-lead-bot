@@ -94,6 +94,15 @@ def rule_score(item: Item, profile: dict) -> tuple[int, str]:
         if dom:
             score += 10
             why.append("domain eval: " + ", ".join(dom[:2]))
+    # owner has ~2 years of experience: senior titles and language-specific roles are poor fits
+    senior = _hits(title, profile.get("seniority_keywords", []))
+    if senior:
+        score -= 30
+        why.append("too senior: " + ", ".join(senior[:2]))
+    lang = _hits(title, profile.get("language_role_keywords", []))
+    if lang:
+        score -= 35
+        why.append("language-specific role: " + ", ".join(lang[:2]))
     avoid = _hits(title, profile.get("avoid_keywords", []))
     if avoid:
         score -= 25
@@ -124,6 +133,21 @@ def score_items(items: list[Item], profile: dict, cfg: dict | None = None) -> No
         if boost:
             it.score = min(100, (it.score or 0) + boost)
             it.score_reason += f"; target company +{boost}"
+        cap, why = fit_cap(it, profile)
+        if cap is not None and (it.score or 0) > cap:
+            it.score = cap
+            it.score_reason += f"; capped at {cap} ({why})"
+
+
+def fit_cap(item: Item, profile: dict) -> tuple[int | None, str]:
+    """Hard ceiling for roles the owner can't realistically get: senior titles stay out of instant
+    alerts (digest at most), language-specific roles are effectively dropped."""
+    title = item.title.lower()
+    if _hits(title, profile.get("language_role_keywords", [])):
+        return 40, "language-specific role"
+    if _hits(title, profile.get("seniority_keywords", [])):
+        return 60, "senior title"
+    return None, ""
 
 
 def _llm_refine(items: list[Item], profile: dict, cfg: dict | None) -> None:

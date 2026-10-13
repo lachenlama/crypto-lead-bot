@@ -90,3 +90,32 @@ packages:
     price_range: "$2000-$6000"
   - name: AI eval & task building
     price_range: "$40-$100/hr"
+
+# ~2 years of startup experience: titles that signal a more senior role get a penalty
+seniority_keywords:
+  - senior
+  - sr
+  - staff
+  - principal
+  - lead
+  - head
+  - director
+  - vp
+  - manager
+  - chief
+  - architect
+# roles that need a specific native language (e.g. "Speech Collection Evaluator (Arabic)")
+language_role_keywords:
+  - transcription
+  - arabic
+  - burmese
+  - mandarin
+  - czech
+  - greek
+  - hebrew
+  - polish
+  - portuguese
+  - thai
+  - vietnamese
+  - amharic
+  - language

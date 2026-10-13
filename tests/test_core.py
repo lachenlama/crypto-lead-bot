@@ -77,3 +77,19 @@ def test_format_alert_escapes_and_warns():
     out = telegram.format_alert(it)
     assert "&lt;b&gt;" in out and "⚠️" in out and "<blockquote>" in out
     assert len(out) <= 4096
+
+
+def test_senior_and_language_roles_score_low():
+    from bot import score
+    from bot.config import load_profile
+    from bot.models import Item
+    prof = load_profile()
+    def mk(title, org="Acme"):
+        return Item(source="watchlist", kind="job", external_id=title, title=title, org=org,
+                    url="u", description="Python AI data", tags=["target", "tier1", "ai_eval"])
+    low = [mk("Senior Data Analyst"), mk("Speech Collection Evaluator (Arabic-Qatar_MSA)"),
+           mk("Czech Language Transcription Expert")]
+    ok = mk("Freelance Forward Deployed AI Engineer")
+    score.score_items(low + [ok], prof, {})
+    assert max(i.score for i in low) <= 60
+    assert ok.score >= 90
