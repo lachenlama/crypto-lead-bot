@@ -93,3 +93,15 @@ def test_senior_and_language_roles_score_low():
     score.score_items(low + [ok], prof, {})
     assert max(i.score for i in low) <= 60
     assert ok.score >= 90
+
+
+def test_non_latin_and_language_required_titles_capped():
+    from bot import score
+    from bot.config import load_profile
+    from bot.models import Item
+    prof = load_profile()
+    for t in ["AI Agent 产品专家（C 端金融）", "Client Service Analyst - Livechat (Czech required)"]:
+        it = Item(source="watchlist", kind="lead", external_id=t, title=t, org="X", url="u",
+                  description="python ai agent", tags=["target", "tier1"])
+        score.score_items([it], prof, {})
+        assert it.score <= 40, t

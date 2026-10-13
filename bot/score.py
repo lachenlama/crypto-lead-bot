@@ -143,12 +143,18 @@ def score_items(items: list[Item], profile: dict, cfg: dict | None = None) -> No
             it.score_reason += f"; capped at {cap} ({why})"
 
 
+NON_LATIN_TITLE = re.compile(r"[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]")
+LANG_REQUIRED = re.compile(r"\b[a-z]+(?:/[a-z]+)? (?:speaker|required|speaking)\b")
+
+
 def fit_cap(item: Item, profile: dict) -> tuple[int | None, str]:
     """Hard ceiling for roles the owner can't realistically get: senior titles stay out of instant
     alerts (digest at most), language-specific roles are effectively dropped."""
     title = item.title.lower()
     caps: list[tuple[int, str]] = []
-    if _hits(title, profile.get("language_role_keywords", [])):
+    # a named language, "(Czech required)", or a title written in Chinese/Japanese/Korean
+    if (_hits(title, profile.get("language_role_keywords", [])) or NON_LATIN_TITLE.search(item.title)
+            or LANG_REQUIRED.search(title)):
         caps.append((40, "language-specific role"))
     if _hits(title, profile.get("seniority_keywords", [])):
         caps.append((60, "senior title"))
