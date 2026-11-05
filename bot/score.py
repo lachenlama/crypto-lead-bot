@@ -3,12 +3,13 @@ from __future__ import annotations
 
 import logging
 import re
+from datetime import date
 
-from . import llm, location
+from . import events, llm, location
 from .models import Item
 
 log = logging.getLogger(__name__)
-STABLE = {"", "USD", "USDC", "USDT", "DAI"}
+STABLE = {"", "USD", "USDC", "USDT", "USDG", "PYUSD", "DAI"}
 HOURS_PER_YEAR = 2000
 
 
@@ -48,7 +49,53 @@ def target_boost(item: Item) -> int:
     return max((v for k, v in TIER_BOOST.items() if k in item.tags), default=0)
 
 
-def rule_score(item: Item, profile: dict) -> tuple[int, str]:
+def size_bonus(item: Item) -> tuple[int, str]:
+    """Hackathon prize pool / grant size (rough USD) -> score adjustment. Unknown size -> 0."""
+    usd = events.to_usd(max(item.pay_min or 0, item.pay_max or 0) or None, item.pay_currency)
+    if usd is None:
+        return 0, ""
+    tiers = [(50000, 15), (10000, 10), (2000, 5)] if item.kind == "hackathon" else [(10000, 15), (2000, 10), (600, 5)]
+    for floor, pts in tiers:
+        if usd >= floor:
+            return pts, f"{'prize pool' if item.kind == 'hackathon' else 'grant'} ~${usd:,.0f}"
+    return -10, f"small {'prize pool' if item.kind == 'hackathon' else 'grant'} ~${usd:,.0f}"
+
+
+def deadline_penalty(item: Item, today: date | None = None) -> tuple[int, str]:
+    left = events.days_left(item.deadline, today)
+    if left is None:
+        return 0, ""
+    if left < 0:
+        return -40, "deadline passed"
+    if left < 2:
+        return -15, f"deadline in {left}d"
+    return 0, ""
+
+
+def _event_score(item: Item, profile: dict, text: str, title: str, today: date | None) -> tuple[int, list[str], bool]:
+    """Extra points for hackathons / grants: theme fit, organiser, size, deadline."""
+    opp = profile.get("opportunities", {})
+    pri = set(_hits(text, profile.get("priority_skills", [])))
+    words = [w for w in opp.get("keywords", []) if w not in pri]
+    t_hits = _hits(title, words)
+    b_hits = [w for w in _hits(text, words) if w not in t_hits]
+    score, why = 0, []
+    if t_hits or b_hits:
+        score += min(len(t_hits) * 20, 40) + min(len(b_hits) * 8, 24)
+        why.append("themes: " + ", ".join((t_hits + b_hits)[:4]))
+    org_text = f"{item.org} {item.title}".lower()
+    if any(o.lower() in org_text for o in opp.get("trusted_organizers", [])):
+        score += 15
+        why.append("well-known organiser")
+    for pts, reason in (size_bonus(item), deadline_penalty(item, today)):
+        if reason:
+            score += pts
+            why.append(reason)
+    return score, why, bool(t_hits or b_hits)
+
+
+def rule_score(item: Item, profile: dict, today: date | None = None) -> tuple[int, str]:
+    is_event = item.kind in events.EVENT_KINDS
     tags = [t for t in item.tags if t not in META_TAGS]
     text = " ".join([item.title, item.description, " ".join(tags)]).lower()
     title = item.title.lower()
@@ -71,7 +118,8 @@ def rule_score(item: Item, profile: dict) -> tuple[int, str]:
         matched = True
         score += min(len(sec) * 4, 8)
         why.append("secondary: " + ", ".join(sec[:3]))
-    bonus_title = _hits(title, profile.get("bonus_keywords", []))
+    # analyst/treasury role bonus; not for events ("The Touching Grass Fund" isn't a fund role)
+    bonus_title = [] if is_event else _hits(title, profile.get("bonus_keywords", []))
     bonus = bonus_title or (
         _hits(text, profile.get("bonus_keywords", [])) if item.kind == "lead" else []
     )
@@ -94,8 +142,13 @@ def rule_score(item: Item, profile: dict) -> tuple[int, str]:
         if dom:
             score += 10
             why.append("domain eval: " + ", ".join(dom[:2]))
+    if is_event:
+        pts, ev_why, ev_matched = _event_score(item, profile, text, title, today)
+        score += pts
+        why.extend(ev_why)
+        matched = matched or ev_matched
     # owner has ~2 years of experience: senior titles and language-specific roles are poor fits
-    senior = _hits(title, profile.get("seniority_keywords", []))
+    senior = [] if is_event else _hits(title, profile.get("seniority_keywords", []))
     if senior:
         score -= 30
         why.append("too senior: " + ", ".join(senior[:2]))
@@ -109,9 +162,11 @@ def rule_score(item: Item, profile: dict) -> tuple[int, str]:
         why.append("avoid: " + ", ".join(avoid[:2]))
     if not matched:
         score = min(score, NO_MATCH_CAP)
+        if is_event:  # an off-theme event shouldn't climb back above the cap via prize size
+            why.append("off-theme")
     elif item.kind == "lead":
         score += 5
-    pay = pay_vs_floor(item, profile)
+    pay = None if is_event else pay_vs_floor(item, profile)  # prize pools aren't rates
     if pay == "below":
         score -= 15
         why.append("pay below floor")
@@ -122,10 +177,10 @@ def rule_score(item: Item, profile: dict) -> tuple[int, str]:
     return score, "; ".join(why) or "no profile keywords matched"
 
 
-def score_items(items: list[Item], profile: dict, cfg: dict | None = None) -> None:
+def score_items(items: list[Item], profile: dict, cfg: dict | None = None, today: date | None = None) -> None:
     """Set score / score_reason / package on each item (in place)."""
     for it in items:
-        it.score, it.score_reason = rule_score(it, profile)
+        it.score, it.score_reason = rule_score(it, profile, today)
     if llm.available() and items:
         _llm_refine(items, profile, cfg)
     for it in items:  # target-company boost applies to the final score
@@ -156,25 +211,28 @@ def fit_cap(item: Item, profile: dict) -> tuple[int | None, str]:
     if (_hits(title, profile.get("language_role_keywords", [])) or NON_LATIN_TITLE.search(item.title)
             or LANG_REQUIRED.search(title)):
         caps.append((40, "language-specific role"))
-    if _hits(title, profile.get("seniority_keywords", [])):
+    is_event = item.kind in events.EVENT_KINDS
+    if not is_event and _hits(title, profile.get("seniority_keywords", [])):
         caps.append((60, "senior title"))
-    if item.kind == "job":  # DAO leads and gigs are never capped by location
+    if item.kind == "job" or is_event:  # DAO leads and gigs are never capped by location
         status, label = location.classify(item)
         if status == location.RESTRICTED:
-            caps.append((LOCATION_CAPS[status], f"remote limited to {label}"))
+            what = f"{label} residents only" if is_event else f"remote limited to {label}"
+            caps.append((EVENT_LOCATION_CAP if is_event else LOCATION_CAPS[status], what))
         elif status == location.ONSITE:
-            caps.append((LOCATION_CAPS[status], f"onsite {label}"))
+            caps.append((EVENT_LOCATION_CAP if is_event else LOCATION_CAPS[status], f"{'in person' if is_event else 'onsite'} {label}"))
     return min(caps) if caps else (None, "")
 
 
 LOCATION_CAPS = {location.RESTRICTED: 45, location.ONSITE: 30}
+EVENT_LOCATION_CAP = 20  # hackathon in person abroad / grant for residents of another country: not eligible
 
 
 def location_bonus(item: Item) -> tuple[int, str]:
     """Owner prefers worldwide / US-EU-UK remote roles; contract roles in the West get a small bump."""
     status, label = location.classify(item)
     if status in (location.OPEN, location.REMOTE_WEST):
-        return 10, f"remote {label}"
+        return 10, (label if item.kind in events.EVENT_KINDS else f"remote {label}")
     if status == location.CONTRACT_OK and location.is_west(label):
         return 5, f"contract {label}"
     return 0, ""

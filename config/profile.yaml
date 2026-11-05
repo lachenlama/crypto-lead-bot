@@ -120,3 +120,30 @@ language_role_keywords:
   - vietnamese
   - amharic
   - language
+
+# Hackathons and grants (v1.3): paid work only (cash prizes, grants). Used by rule scoring.
+opportunities:
+  keywords:            # themes that fit the owner; title hits weigh more than description hits
+    - blockchain
+    - web3
+    - crypto
+    - defi
+    - ethereum
+    - solana
+    - on-chain
+    - onchain
+    - agents
+    - agentic
+    - machine learning
+    - fintech
+    - payments
+    - stablecoin
+    - data
+    - analytics
+    - automation
+    - developer tools
+  trusted_organizers:  # well-known organisers with real prize pools: +15
+    - ETHGlobal
+    - Solana Foundation
+    - Colosseum
+    - Ethereum Foundation

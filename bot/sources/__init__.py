@@ -2,10 +2,14 @@
 from . import (
     cryptocurrencyjobs,
     cryptojobslist,
+    devfolio,
+    devpost,
     discourse,
+    ethglobal,
     remoteok,
     snapshot,
     superteam,
+    superteam_grants,
     telegram_channels,
     watchlist,
     web3career,
@@ -23,5 +27,10 @@ SOURCES = {
         discourse,
         watchlist,
         web3career,
+        # hackathons and grants (v1.3)
+        devpost,
+        devfolio,
+        ethglobal,
+        superteam_grants,
     )
 }

@@ -38,12 +38,19 @@ def split_message(text: str, limit: int = LIMIT) -> list[str]:
     return parts
 
 
+PAY_LABEL = {"hackathon": "Prize pool", "grant": "Grant size"}
+KIND_ICON = {"hackathon": "🏆", "grant": "💰"}
+
+
 def fmt_pay(it: Item) -> str:
     if not it.has_pay:
-        return "n/a"
+        return "not stated" if it.kind in PAY_LABEL else "n/a"
     lo, hi = it.pay_min, it.pay_max
     rng = f"{lo:,.0f}" if lo == hi or hi is None else f"{lo or 0:,.0f}-{hi:,.0f}"
-    return f"{rng} {it.pay_currency} /{it.pay_unit}".strip()
+    if it.kind == "grant" and not lo:
+        rng = f"up to {hi:,.0f}"
+    unit = "" if it.kind in PAY_LABEL else f" /{it.pay_unit}"
+    return f"{rng} {it.pay_currency}{unit}".strip()
 
 
 NEXT_STEP = "Apply within 24h; look for a referral from someone on the team"
@@ -52,13 +59,18 @@ NEXT_STEP = "Apply within 24h; look for a referral from someone on the team"
 def format_alert(it: Item) -> str:
     e = html.escape
     lines = []
-    if "ai_eval" in it.tags:
+    if it.kind == "hackathon":
+        lines.append("🏆 Hackathon")
+    elif it.kind == "grant":
+        lines.append("💰 Grant")
+    elif "ai_eval" in it.tags:
         lines.append("🧪 AI eval gig")
     elif "target" in it.tags:
         lines.append("🎯 Target company")
     lines.append(f"<b>{e(it.title)}</b>")
     lines.append(f"{e(it.org or 'unknown org')} | {e(it.kind)} | {e(it.source)}")
-    lines.append(f"Pay: {e(fmt_pay(it))}" + (f" | Deadline: {e(it.deadline)}" if it.deadline else ""))
+    lines.append(f"{PAY_LABEL.get(it.kind, 'Pay')}: {e(fmt_pay(it))}"
+                 + (f" | Deadline: {e(it.deadline)}" if it.deadline else ""))
     lines.append(e(location.alert_line(it)))
     lines.append(f"Score: <b>{it.score}</b> - {e(it.score_reason)}")
     if it.package:
@@ -84,7 +96,8 @@ def format_digest(items: list[Item]) -> str:
     lines = [f"<b>Digest: {len(items)} more leads (score 50-69)</b>"]
     for it in items:
         warn = " ⚠️" if it.scam_flags else ""
-        lines.append(f"{location.emoji(it)} {it.score} | <a href=\"{e(it.url, quote=True)}\">{e(it.title[:80])}</a> - {e(it.org or it.source)}{warn}")
+        kind = KIND_ICON.get(it.kind, "")
+        lines.append(f"{location.emoji(it)}{kind} {it.score} |<a href=\"{e(it.url, quote=True)}\">{e(it.title[:80])}</a> - {e(it.org or it.source)}{warn}")
     return "\n".join(lines)
 
 

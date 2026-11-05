@@ -1,11 +1,12 @@
 # crypto-lead-bot
 
-Finds crypto jobs, gigs and DAO treasury leads that match the owner's profile, scores them
+Finds crypto jobs, gigs, DAO treasury leads, hackathons and grants that match the owner's profile, scores them
 (rules + optional Claude refinement), drafts pitches, and sends Telegram alerts. Runs every
 4 hours via GitHub Actions; state lives in `data/leads.db` (committed back by the workflow).
 
-Sources: cryptocurrencyjobs.co, CryptoJobsList, RemoteOK (attribution kept), Superteam Earn,
-public Telegram channel previews, Snapshot active proposals, DAO Discourse forums.
+Sources: cryptocurrencyjobs.co, CryptoJobsList, RemoteOK (attribution kept), Superteam Earn (bounties and grants),
+public Telegram channel previews, Snapshot active proposals, DAO Discourse forums, and hackathons from
+Devpost, Devfolio and ETHGlobal.
 Optional (off by default): web3.career (`WEB3_CAREER_TOKEN`).
 
 ## Setup
@@ -90,3 +91,21 @@ location text (the `Location:` line on watchlist/RemoteOK items, else title/desc
 region, score capped at 45), `onsite` (a city, no remote, capped at 30) and `unknown` (no change).
 Gigs and DAO leads are never capped. Each alert carries a `📍` line and digest lines an emoji.
 Edit the lexicons at the top of `bot/location.py` to tune it.
+
+## Hackathons and grants
+
+Paid opportunities besides jobs (cash-prize hackathons and grants; no airdrops or quests). Hackathons
+are **online only**: in-person ones (and ones with no location) are dropped before scoring
+(`hackathons_online_only: true` in `config/sources.yaml`; hybrid counts as online).
+- `devpost`: Devpost hackathons for the themes in `devpost_themes` (`config/sources.yaml`), biggest prizes first.
+  Invite-only and no-cash-prize events are skipped.
+- `devfolio`: Devfolio hackathons with open applications (mostly India; prize read from the description).
+- `ethglobal`: upcoming ETHGlobal hackathons (parsed from ethglobal.com/events).
+- `superteam_grants`: Superteam / Solana Foundation grants (many are for one country's residents).
+
+Alerts start with `🏆 Hackathon` or `💰 Grant` and show the prize pool / grant size, deadline and
+eligibility (`📍 Online ✅`, `📍 India ✅`,
+`📍 USA residents only ❌`). Scoring uses theme fit (`opportunities.keywords` in `config/profile.yaml`),
+prize/grant size, deadline and `opportunities.trusted_organizers`; grants for
+other countries' residents are capped at 20 so they never alert. With an LLM key, top hackathons get a
+project idea and top grants a proposal angle instead of a pitch.

@@ -1,0 +1,17 @@
+{"result": [
+  {"uuid": "0dab52b6", "name": "THE BIG HACK 2.0", "slug": "the-big-hack-2", "tagline": "National Level Tech Fest",
+   "desc": "Tech Habba 2.0 is hosted at Acharya Institutes, Bengaluru.\nHackathon Tracks\n- Autonomous Systems: AI-powered agents.\nWhat to Expect\n- ₹1,25,000 prize pool\n- Entry pass ₹300",
+   "starts_at": "2026-11-20T03:30:00.000Z", "ends_at": "2026-11-20T19:15:00.000Z", "is_online": false,
+   "city": "Soladevanahalli", "state": "Karnataka", "country": "India", "private": false,
+   "hackathon_setting": {"subdomain": "the-big-hack-2", "reg_ends_at": "2026-11-10T11:00:00.000Z",
+                         "is_hybrid": false, "external_apply_url": null},
+   "themes": [{"uuid": "a1", "name": "No Restrictions"}]},
+  {"uuid": "9f00aa", "name": "hackodisha-6.0", "slug": "hackodisha-6a", "tagline": "Build onchain",
+   "desc": "Prizes worth $10k from sponsors for DeFi and AI agent tracks.",
+   "starts_at": "2026-12-11T16:30:00.000Z", "ends_at": "2026-12-13T06:30:00.000Z", "is_online": true,
+   "city": null, "country": null, "private": false,
+   "hackathon_setting": {"subdomain": "hackodisha-6a", "reg_ends_at": "2026-12-10T18:29:00.000Z", "is_hybrid": false},
+   "themes": [{"uuid": "b2", "name": "Blockchain"}, {"uuid": "b3", "name": "AI"}]},
+  {"uuid": "secret", "name": "Private Hack", "slug": "private-hack", "private": true,
+   "hackathon_setting": {"subdomain": "private-hack"}, "themes": []}
+], "count": 3, "pages": 1}

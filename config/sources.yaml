@@ -7,10 +7,22 @@ enabled:
   snapshot: true
   discourse: true
   watchlist: true        # config/watchlist.yaml (Greenhouse/Lever/Ashby)
+  # hackathons and grants (v1.3)
+  devpost: true          # Devpost API, themes below, sorted by prize
+  devfolio: true         # Devfolio API (mostly India)
+  ethglobal: true        # ethglobal.com/events, Upcoming section
+  superteam_grants: true # superteam.fun/api/grants
   web3career: false      # needs WEB3_CAREER_TOKEN
 
 telegram_channels:
   - cryptojobslist
+
+hackathons_online_only: true   # drop in-person hackathons (hybrid counts as online)
+
+devpost_themes:
+  - Blockchain
+  - Machine Learning/AI
+  - Fintech
 
 forums:
   - forum.arbitrum.foundation

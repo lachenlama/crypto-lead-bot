@@ -59,7 +59,7 @@ def save_item(conn: sqlite3.Connection, it: Item, alerted: bool = False) -> None
             ts if alerted else None, json.dumps(it.scam_flags),
         ),
     )
-    if it.has_pay:
+    if it.has_pay and it.kind not in ("hackathon", "grant"):  # prize pools / grant sizes aren't rates
         conn.execute(
             "INSERT INTO pay_observations VALUES (?,?,?,?,?,?,?,?)",
             (it.key, it.source, it.title, it.pay_min, it.pay_max, it.pay_unit,

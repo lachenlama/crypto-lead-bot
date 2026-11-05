@@ -19,7 +19,7 @@ PATTERNS: list[tuple[str, str]] = [
 ]
 COMPILED = [(re.compile(p, re.I), msg) for p, msg in PATTERNS]
 HUGE_PAY_USD = 20000
-STABLE = {"", "USD", "USDC", "USDT", "DAI"}
+STABLE = {"", "USD", "USDC", "USDT", "USDG", "PYUSD", "DAI"}
 
 
 def check(item: Item, huge_pay: float = HUGE_PAY_USD) -> list[str]:

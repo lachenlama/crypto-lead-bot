@@ -26,7 +26,7 @@ def clean_text(s: str | None, limit: int = MAX_DESC) -> str:
 @dataclass
 class Item:
     source: str
-    kind: str  # job | gig | lead
+    kind: str  # job | gig | lead | hackathon | grant
     external_id: str
     title: str
     org: str = ""

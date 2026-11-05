@@ -1,0 +1,13 @@
+[
+  {"slug": "solana-foundation-india-grants", "title": "Solana Foundation India Grants", "minReward": 0, "maxReward": 10000,
+   "token": "USDG", "sponsor": {"name": "Superteam India"}, "approvedAmountTotal": 52000, "totalApplications": 40},
+  {"slug": "solana-foundation-usa-grants", "title": "Solana Foundation USA Grants", "minReward": 0, "maxReward": 10000,
+   "token": "USDG", "sponsor": {"name": "Superteam USA"}, "approvedAmountTotal": 90000, "totalApplications": 75},
+  {"slug": "touching-grass-india", "title": "The Touching Grass Fund (India)", "minReward": 0, "maxReward": 500,
+   "token": "USDG", "sponsor": {"name": "Superteam India"}},
+  {"slug": "la-familia-spain", "title": "La Familia Spain Grants", "minReward": 1000, "maxReward": 10000,
+   "token": "USDG", "sponsor": {"name": "Superteam Spain"}},
+  {"slug": "agentic-engineering-grants", "title": "Agentic Engineering Grants", "minReward": 200, "maxReward": 200,
+   "token": "USDG", "sponsor": {"name": "Superteam"}},
+  {"title": "missing slug"}
+]

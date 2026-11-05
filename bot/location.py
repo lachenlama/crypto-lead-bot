@@ -235,7 +235,26 @@ def _is_contract(item: Item, loc: str, text: str) -> bool:
     return bool(CONTRACT_DESC_RE.search(text))
 
 
+ONLINE_RE = re.compile(r"(?<![a-z])(online|virtual|remote|worldwide|global|anywhere)(?![a-z])", re.I)
+
+
+def _classify_event(item: Item) -> tuple[str, str]:
+    """Hackathons / grants: online (or open to anyone) -> open; in India -> india_apac; another country:
+    hackathon -> onsite (in person elsewhere), grant -> restricted (residents only)."""
+    loc, _ = _location_text(item)
+    if not loc or loc.lower() == "not stated":
+        return UNKNOWN, ""
+    if ONLINE_RE.search(loc):
+        return OPEN, "online"
+    label = _clean_label(loc.split("|")[0])
+    if INDIA_RE.search(loc):
+        return INDIA_APAC, label
+    return (ONSITE if item.kind == "hackathon" else RESTRICTED), label
+
+
 def classify(item: Item) -> tuple[str, str]:
+    if item.kind in ("hackathon", "grant"):
+        return _classify_event(item)
     loc, text = _location_text(item)
     contract = _is_contract(item, loc, text)
     segs = [_segment(s) for s in re.split(r"[;|]", loc) if s.strip()] if loc else []
@@ -274,8 +293,24 @@ def _text_fallback(item: Item, text: str, loc: str, contract: bool) -> tuple[str
     return status, label
 
 
+def _event_line(item: Item, status: str, label: str) -> str:
+    if item.kind == "hackathon":
+        return {
+            OPEN: "📍 Online ✅",
+            INDIA_APAC: f"📍 In person, {label} ✅ (travel within India)",
+            ONSITE: f"📍 In person, {label} ❌",
+        }.get(status, "📍 Location not stated ❔")
+    return {
+        OPEN: "📍 Open to anyone ✅",
+        INDIA_APAC: f"📍 {label} ✅",
+        RESTRICTED: f"📍 {label} residents only ❌",
+    }.get(status, "📍 Eligibility not stated ❔ (check the rules)")
+
+
 def alert_line(item: Item) -> str:
     status, label = classify(item)
+    if item.kind in ("hackathon", "grant"):
+        return _event_line(item, status, label)
     if status == OPEN:
         return "📍 Remote, worldwide ✅"
     if status == REMOTE_WEST:

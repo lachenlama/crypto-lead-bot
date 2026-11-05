@@ -6,7 +6,7 @@ import argparse
 import logging
 import sys
 
-from . import db, pitch, scam, score
+from . import db, location, pitch, scam, score
 from .config import DB_PATH, load_profile, load_sources_config
 from .models import Item
 from .sources import SOURCES, watchlist
@@ -15,13 +15,20 @@ from .telegram import Notifier, format_alert, format_digest
 log = logging.getLogger("bot")
 
 
+def keep(item: Item, cfg: dict) -> bool:
+    """Hackathons must be online (hybrid counts) unless `hackathons_online_only: false`."""
+    if item.kind == "hackathon" and cfg.get("hackathons_online_only", True):
+        return location.classify(item)[0] == location.OPEN
+    return True
+
+
 def fetch_all(names: list[str], cfg: dict, limit: int | None) -> tuple[list[tuple[str, Item]], dict]:
     items: list[tuple[str, Item]] = []
     stats: dict[str, dict] = {}
     for name in names:
         st = stats[name] = {"fetched": 0, "new": 0, "errors": 0}
         try:
-            got = SOURCES[name].fetch(cfg)
+            got = [it for it in SOURCES[name].fetch(cfg) if keep(it, cfg)]
             if limit:
                 got = got[:limit]
             st["fetched"] = len(got)
